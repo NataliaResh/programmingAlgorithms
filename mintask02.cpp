@@ -61,7 +61,7 @@ public:
     }
     LongNumber res(len);
     int pivot = 0;
-    for (int i = 0; i < len; i++) {
+    for (size_t i = 0; i < len; i++) {
       int temp_sum = at(i) + right[i] + pivot;
       res[i] = temp_sum % 10;
       pivot = (temp_sum - res[i]) / 10;
@@ -88,6 +88,29 @@ public:
       }
     }
     res.delete_zeros();
+    return res;
+  }
+
+  LongNumber operator*(LongNumber right) {
+    vector<LongNumber> temp_res(right.size());
+    for (size_t i = 0; i < right.size(); i++) {
+      LongNumber temp(size());
+      int pivot = 0;
+      for (size_t j = 0; j < size(); j++) {
+        int temp_mul = right[i] * at(j) + pivot;
+        temp[j] = temp_mul % 10;
+        pivot = (temp_mul - temp[i]) / 10;
+      }
+      if (pivot > 0) {
+        temp.push_back(pivot);
+      }
+      temp.add_zeros_back(i);
+      temp_res[i] = temp;
+    }
+    LongNumber res = temp_res[0];
+    for (size_t i = 1; i < right.size(); i++) {
+      res = res + temp_res[i];
+    }
     return res;
   }
 };
@@ -154,5 +177,7 @@ int main() {
   LongNumber a = input_int(n), b = input_int(m);
   LongNumber c = kara(a, b);
   print_int(c);
+  LongNumber d = a * b;
+  print_int(d);
   return 0;
 }

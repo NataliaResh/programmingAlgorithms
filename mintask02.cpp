@@ -1,6 +1,10 @@
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <iostream>
+#include <locale>
+#include <string>
+#include <sys/types.h>
 #include <vector>
 
 using namespace std;
@@ -14,14 +18,14 @@ public:
       push_back(0);
     }
   }
-  
+
   void add_zeros_back(size_t count) {
     reverse(begin(), end());
     add_zeros(count);
     reverse(begin(), end());
   }
   void delete_zeros() {
-    while (back() == 0 && size() > 1) {
+    while (size() > 1 && back() == 0) {
       pop_back();
     }
   }
@@ -36,6 +40,17 @@ public:
     return new_number;
   }
 
+  bool operator==(LongNumber &right) {
+    if (size() != right.size()) {
+      return false;
+    }
+    for (size_t i = 0; i < size(); i++) {
+      if (at(i) != right[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
   bool operator<(LongNumber &right) {
     if (size() != right.size()) {
       return size() < right.size();
@@ -78,7 +93,7 @@ public:
       if (res[i] >= right[i]) {
         res[i] -= right[i];
       } else {
-        int j = i + 1;
+        size_t j = i + 1;
         while (res[j] == 0) {
           res[j] = 9;
           j++;
@@ -99,7 +114,7 @@ public:
       for (size_t j = 0; j < size(); j++) {
         int temp_mul = right[i] * at(j) + pivot;
         temp[j] = temp_mul % 10;
-        pivot = (temp_mul - temp[i]) / 10;
+        pivot = (temp_mul - temp[j]) / 10;
       }
       if (pivot > 0) {
         temp.push_back(pivot);
@@ -111,6 +126,7 @@ public:
     for (size_t i = 1; i < right.size(); i++) {
       res = res + temp_res[i];
     }
+    res.delete_zeros();
     return res;
   }
 };
@@ -128,6 +144,15 @@ LongNumber input_int(int len) {
     char temp;
     cin >> temp;
     array[i] = temp - '0';
+  }
+  return array;
+}
+
+LongNumber num_from_string(string str) {
+  size_t len = str.size();
+  LongNumber array(len);
+  for (int i = len - 1; i >= 0; i--) {
+    array[i] = str[len - 1 - i] - '0';
   }
   return array;
 }
@@ -171,13 +196,43 @@ LongNumber kara(LongNumber x, LongNumber y) {
   return res;
 }
 
-int main() {
-  int n, m;
-  cin >> n >> m;
-  LongNumber a = input_int(n), b = input_int(m);
-  LongNumber c = kara(a, b);
-  print_int(c);
-  LongNumber d = a * b;
-  print_int(d);
+int main(int argc, char *argv[]) {
+  LongNumber a, b;
+  a = num_from_string("1234");
+  b = num_from_string("5678");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("1");
+  b = num_from_string("10");
+  assert(kara(a, b) == (a * b));
+
+  a = num_from_string("654321");
+  b = num_from_string("101");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("12345");
+  b = num_from_string("0");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("7");
+  b = num_from_string("8");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("1234567890987654321");
+  b = num_from_string("987654321123456789");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("1234565478987654345432344321");
+  b = num_from_string("5678876545432345987654");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("98546826024568732548542958656457");
+  b = num_from_string("23456000034567236300000000000028");
+  assert(kara(a, b) == a * b);
+
+  a = num_from_string("12");
+  b = num_from_string("56728");
+  assert(kara(a, b) == a * b);
+
   return 0;
 }

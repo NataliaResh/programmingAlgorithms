@@ -9,7 +9,7 @@ public:
   LongNumber() : vector<char>() {}
   LongNumber(size_t len) : vector<char>(len) {}
   void add_zeros(int count) {
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
       push_back(0);
     }
   }
@@ -72,7 +72,7 @@ public:
       if (res[i] >= right[i]) {
         res[i] -= right[i];
       } else {
-        int j = i + 1;
+        size_t j = i + 1;
         while (res[j] == 0) {
           res[j] = 9;
           j++;
@@ -108,16 +108,16 @@ void division_imp(LongNumber &a, LongNumber &b, LongNumber &c,
   if (a.size() == 0) {
     return;
   }
-  pivot.insert(pivot.begin(), a.back());
-  a.pop_back();
+  pivot.insert(pivot.begin(), a.back()); // m
+  a.pop_back();                          // 1
   int res = 0;
-  LongNumber temp = b.copy();
+  LongNumber temp = b.copy(); // m
   for (; temp <= pivot; res++) {
-    temp = temp + b;
+    temp = temp + b; // m
   }
-  c.insert(c.begin(), res);
-  pivot = pivot - (temp - b);
-  division_imp(a, b, c, pivot);
+  c.insert(c.begin(), res);     // (n - m)
+  pivot = pivot - (temp - b);   // m
+  division_imp(a, b, c, pivot); // n
 }
 
 LongNumber division(LongNumber a, LongNumber b) {

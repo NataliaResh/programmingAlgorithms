@@ -6,6 +6,7 @@ first_hash = sys.argv[2]
 second_hash = sys.argv[3]
 command = sys.argv[4]
 
+current_path = os.getcwd()
 os.chdir(path)
 stream = os.popen("git log " + first_hash + " " + second_hash + " --oneline")
 logs = [log.split()[0] for log in stream.read().split('\n')[:-1]]
@@ -23,4 +24,6 @@ while left + 1 < right:
         left = pivot
     else:
         right = pivot
+#  os.popen("git checkout " + first_hash + " -q")
+os.chdir(current_path)
 print("First bad commit: ", logs[left])

@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <iostream>
 #include <locale>
+#include <random>
 #include <string>
 #include <sys/types.h>
 #include <vector>
@@ -11,8 +12,12 @@ using namespace std;
 
 class LongNumber : public vector<char> {
 public:
+  bool negative = false;
   LongNumber() : vector<char>() {}
   LongNumber(size_t len) : vector<char>(len) {}
+  LongNumber(size_t len, bool is_negative) : vector<char>(len){
+    negative = is_negative;
+  }
   void add_zeros(size_t count) {
     for (size_t i = 0; i < count; i++) {
       push_back(0);
@@ -131,33 +136,22 @@ public:
   }
 };
 
-void print_int(LongNumber &array) {
-  for (int i = array.size() - 1; i >= 0; i--) {
-    cout << (char)(array[i] + '0');
-  }
-  cout << "\n";
-}
-
-LongNumber input_int(int len) {
-  LongNumber array(len);
-  for (int i = len - 1; i >= 0; i--) {
-    char temp;
-    cin >> temp;
-    array[i] = temp - '0';
-  }
-  return array;
-}
-
 LongNumber num_from_string(string str) {
   size_t len = str.size();
-  LongNumber array(len);
-  for (int i = len - 1; i >= 0; i--) {
-    array[i] = str[len - 1 - i] - '0';
+  bool negative = str[0] == '-';
+  int end = 0;
+  if (negative) {
+    end++;
+    len--;
+  }
+  LongNumber array(len, negative);
+  for (int i = str.size() - 1; i >= end; i--) {
+    array[i] = str[str.size() - 1 - i] - '0';
   }
   return array;
 }
 
-LongNumber kara(LongNumber x, LongNumber y) {
+LongNumber kara_imp(LongNumber x, LongNumber y) {
   int n;
   if (x.size() > y.size()) {
     n = x.size();
@@ -185,14 +179,22 @@ LongNumber kara(LongNumber x, LongNumber y) {
   LongNumber b = x.copy(0, len_b);
   LongNumber c = y.copy(len_b, n);
   LongNumber d = y.copy(0, len_b);
-  LongNumber ac = kara(a, c);
-  LongNumber bd = kara(b, d);
-  LongNumber theird = kara(a + b, c + d);
+  LongNumber ac = kara_imp(a, c);
+  LongNumber bd = kara_imp(b, d);
+  LongNumber theird = kara_imp(a + b, c + d);
   LongNumber ad_plus_bc = (theird - bd) - ac;
   ac.add_zeros_back(n);
   ad_plus_bc.add_zeros_back(len_b);
   res = ac + ad_plus_bc + bd;
   res.delete_zeros();
+  return res;
+}
+
+LongNumber kara(LongNumber a, LongNumber b) {
+  LongNumber res = kara_imp(a, b);
+  if ((a.negative && !b.negative) || (!a.negative && b.negative)) {
+    res.negative = true;
+  }
   return res;
 }
 
@@ -206,7 +208,7 @@ int main(int argc, char *argv[]) {
   b = num_from_string("10");
   assert(kara(a, b) == (a * b));
 
-  a = num_from_string("654321");
+  a = num_from_string("-654321");
   b = num_from_string("101");
   assert(kara(a, b) == a * b);
 
@@ -214,8 +216,8 @@ int main(int argc, char *argv[]) {
   b = num_from_string("0");
   assert(kara(a, b) == a * b);
 
-  a = num_from_string("7");
-  b = num_from_string("8");
+  a = num_from_string("-7");
+  b = num_from_string("-8");
   assert(kara(a, b) == a * b);
 
   a = num_from_string("1234567890987654321");
@@ -231,7 +233,7 @@ int main(int argc, char *argv[]) {
   assert(kara(a, b) == a * b);
 
   a = num_from_string("12");
-  b = num_from_string("56728");
+  b = num_from_string("-56728");
   assert(kara(a, b) == a * b);
 
   return 0;

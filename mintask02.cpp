@@ -46,7 +46,7 @@ public:
   }
 
   bool operator==(LongNumber &right) {
-    if (size() != right.size()) {
+    if (size() != right.size() || negative != right.negative) {
       return false;
     }
     for (size_t i = 0; i < size(); i++) {
@@ -57,11 +57,17 @@ public:
     return true;
   }
   bool operator<(LongNumber &right) {
+    if (negative && !right.negative) {
+      return true;
+    }
     if (size() != right.size()) {
       return size() < right.size();
     }
     for (int i = size() - 1; i >= 0; i--) {
       if (at(i) != right[i]) {
+        if (negative) {
+          return at(i) > right[i];
+        }
         return at(i) < right[i];
       }
     }
@@ -132,6 +138,7 @@ public:
       res = res + temp_res[i];
     }
     res.delete_zeros();
+    res.negative = (negative && !right.negative) || (!negative && right.negative);
     return res;
   }
 };
@@ -192,9 +199,7 @@ LongNumber kara_imp(LongNumber x, LongNumber y) {
 
 LongNumber kara(LongNumber a, LongNumber b) {
   LongNumber res = kara_imp(a, b);
-  if ((a.negative && !b.negative) || (!a.negative && b.negative)) {
-    res.negative = true;
-  }
+  res.negative = (a.negative && !b.negative) || (!a.negative && b.negative);
   return res;
 }
 

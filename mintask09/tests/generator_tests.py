@@ -16,8 +16,7 @@ def random_matrix(n):
     return [[randint(-20, 20) for i in range(n)] for j in range(n)]
 
 
-def generate(test_number):
-    n = randint(10, 1000)
+def generate(test_number, n):
     matrix1 = random_matrix(n)
     matrix2 = random_matrix(n)
     os.mkdir(f"{test_number}")
@@ -35,5 +34,15 @@ def generate(test_number):
     os.chdir("../")
 
 
-for i in range(3, 13):
-    generate(i)
+generate(1, 10)
+generate(2, 50)
+generate(3, 70)
+generate(4, 100)
+generate(5, 150)
+generate(6, 200)
+generate(7, 200)
+generate(8, 256)
+generate(9, 300)
+generate(10, 333)
+generate(11, 360)
+generate(12, 400)

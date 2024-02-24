@@ -5,10 +5,8 @@ import mintask09
 
 from formating import format_table
 
-metrics = ["sample mean", "standard deviation", "geometric mean"]
+benchmarks = ["sample mean", "standard deviation", "geometric mean"]
 algorithms = ["classic algorithm", "quick algorithm", "strassen algorithm"]
-
-# [[0.238675356346456, 1.56, 2.0], [3.3, 2.9, 3.9], [1, 2, 3]])
 
 
 def check(test_number: int):
@@ -18,15 +16,20 @@ def check(test_number: int):
                 open(f"./{test_number}.out", "r", encoding="utf-8") as out:
 
             result_matrix = io.StringIO("")
-            result_metrics = {}
-            assert mintask09.solution(inp, result_matrix, result_metrics)
+            correct_algos, result_metrics = mintask09.solution(inp, result_matrix)
+            assert correct_algos
 
             result_matrix.seek(0)
+            n = 0
             for expected_line in out:
                 real_line = result_matrix.readline()
+                n += 1
                 assert real_line.strip() == expected_line.strip()
 
             assert not result_matrix.readline()
+        with open("../../results", "a", encoding="utf-8") as res:
+            res.write(f"Test number: {test_number}. Size of matrix: {n}\n")
+            res.write(format_table(benchmarks, algorithms, result_metrics) + "\n")
     finally:
         os.chdir("../..")
 

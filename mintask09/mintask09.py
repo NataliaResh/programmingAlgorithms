@@ -1,6 +1,8 @@
-import io
-import sys
 from typing import TextIO
+from time import perf_counter
+import statistics
+
+MIN_SIZE = 64
 
 
 def classic_mul_matrix(matrix1, matrix2):
@@ -35,11 +37,17 @@ def diff_matrix(matrix1, matrix2):
     return ans_matrix
 
 
-def min_degree(n):
-    ans = 2
-    while n > ans:
-        ans *= 2
-    return ans
+def culculate_size(n):
+    i = 1
+    pivot = n
+    while pivot % i == 0:
+        i *= 2
+        pivot //= 2
+    while pivot > MIN_SIZE:
+        i *= 2
+        pivot = (pivot + 1) / 2
+    size = n + i - (n % i)
+    return size
 
 
 def add_zeros_to_matrix(matrix, size):
@@ -50,7 +58,7 @@ def add_zeros_to_matrix(matrix, size):
 
 
 def preparation_matrix(matrix1, matrix2):
-    size = min_degree(len(matrix1))
+    size = culculate_size(len(matrix1))
     add_zeros_to_matrix(matrix1, size)
     add_zeros_to_matrix(matrix2, size)
 
@@ -86,7 +94,7 @@ def create_matrix(part1, part2, part3, part4):
 
 def quick_mul_matrix_imp(matrix1, matrix2):
     n = len(matrix1)
-    if n <= 4:
+    if n < MIN_SIZE:
         return classic_mul_matrix(matrix1, matrix2)
     a, b, c, d = get_sub_matrix(matrix1)
     e, f, g, h = get_sub_matrix(matrix2)
@@ -106,7 +114,7 @@ def quick_mul_matrix(matrix1, matrix2):
 
 def strassen_mul_matrix_imp(matrix1, matrix2):
     n = len(matrix1)
-    if n <= 4:
+    if n < MIN_SIZE:
         return classic_mul_matrix(matrix1, matrix2)
     a, b, c, d = get_sub_matrix(matrix1)
     e, f, g, h = get_sub_matrix(matrix2)
@@ -137,6 +145,22 @@ def print_matrix(matrix):
         print(*matrix[i])
 
 
+def test_algorithm(matrix1, matrix2, n, algorithm):
+    results = []
+    for _ in range(5):
+        test_matrix1 = copy_matrix(matrix1, n)
+        test_matrix2 = copy_matrix(matrix2, n)
+        start = perf_counter()
+        ans = algorithm(test_matrix1, test_matrix2)
+        finish = perf_counter()
+        results.append(finish - start)
+    return ans, results
+
+
+def get_mectrics(results):
+    return [statistics.mean(results), statistics.stdev(results), statistics.geometric_mean(results)]
+
+
 def solution(file_with_mmatrix: TextIO, output: TextIO):
     n = int(file_with_mmatrix.readline().strip())
     matrix1 = []
@@ -146,24 +170,14 @@ def solution(file_with_mmatrix: TextIO, output: TextIO):
     for i in range(n):
         matrix2.append(list(map(int, file_with_mmatrix.readline().strip().split())))
 
-    classic_ans_matrix = classic_mul_matrix(copy_matrix(matrix1, n), copy_matrix(matrix2, n))
-    quick_ans_matrix = quick_mul_matrix(copy_matrix(matrix1, n), copy_matrix(matrix2, n))
-    strassen_ans_matrix = strassen_mul_matrix(copy_matrix(matrix1, n), copy_matrix(matrix2, n))
+    classic_ans_matrix, classic_results = test_algorithm(matrix1, matrix2, n, classic_mul_matrix)
+    quick_ans_matrix, quick_results = test_algorithm(matrix1, matrix2, n, quick_mul_matrix)
+    strassen_ans_matrix, strassen_results = test_algorithm(matrix1, matrix2, n, strassen_mul_matrix)
+
+    trans_results = [get_mectrics(classic_results), get_mectrics(quick_results), get_mectrics(strassen_results)]
+    metrics = [[trans_results[i][j] for i in range(3)] for j in range(3)]
 
     for i in range(n):
         output.write(" ".join(map(str, classic_ans_matrix[i])) + "\n")
 
-    return classic_ans_matrix == quick_ans_matrix == strassen_ans_matrix
-
-
-if __name__ == '__main__':
-    print("$ ", end="")
-    t = ""
-    for line in sys.stdin:
-        if line.strip() == "":
-            break
-        t += line
-    solution(io.StringIO(t), sys.stdout)
-    print("$ ", end="")
-
-
+    return classic_ans_matrix == quick_ans_matrix == strassen_ans_matrix, metrics

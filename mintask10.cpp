@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -25,19 +27,32 @@ vector<string> countingSort(const vector<string> &array, int index) {
 }
 
 vector<string> radixSort(vector<string> array) {
-  for (int i = array.size() - 1; i >= 0; i--) {
+  if (array.size() <= 0) {
+    return array;
+  }
+  for (int i = array[0].size() - 1; i >= 0; i--) {
     array = countingSort(array, i);
-    cout << "dg\n";
-    cout.flush();
   }
   return array;
 }
 
+void test(vector<string> array1) {
+  vector<string> array2(array1);
+  sort(array1.begin(), array1.end());
+  assert(array1 == radixSort(array2));
+  
+}
 int main() {
-  vector<string> a = {"abc", "cbd", "ava"};
-  vector<string> b = radixSort(a);
-  for (int i = 0; i < a.size(); i++) {
-    cout << b[i] << " ";
-  }
-  cout << "\n";
+  test({"abc", "cbd", "ava"});
+  test({"qwerty", "aaaaaa", "bacaba", "123456", "bababa", "babaca"});
+  test({"bbb", "bba", "cba", "cab", "ccc", "cca", "ccb", "acb", "aba", "aaa"});
+  test({"bac", "cab", "Cab", "Bac", "AAa", "aaa"});
+  test({"12", "20", "09", "71", "00", "10", "23"});
+  test({"", ""});
+  test({"b", "r", "q", "a", "l", "o", "g", "c", "m", "z", "s", "w", "e", "i", "p", "t", "n", "x", "n", "u", "d", "f", "h", "j", "k"});
+  test({"10101", "11001", "10000", "222222", "21211", "12121"});
+  test({});
+  test({"cccccccccc", "ccccccccccb", "ccccccccca", "bbbbbbbbbb", "baaaaaaaaa"});
+
+  cout << "All tests passed!\n";
 }

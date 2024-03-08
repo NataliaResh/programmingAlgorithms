@@ -30,7 +30,6 @@ pair<int, int> partitionHoar(vector<int> &array, int start, int end) {
     srand((unsigned) time(NULL));
     int ind = start + (rand() % (end - start + 1));
     int pivot = array[ind];
-    //swap(array[start], array[ind]);
     int i = start, j = end, c = start;
     while (c <= j) {
       if (array[c] < pivot) {

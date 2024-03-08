@@ -46,6 +46,9 @@ public:
   }
 
   bool operator==(LongNumber &right) {
+    if (negative != right.negative) {
+      return false;
+    }
     if (size() != right.size() || negative != right.negative) {
       return false;
     }

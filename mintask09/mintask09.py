@@ -40,12 +40,14 @@ def diff_matrix(matrix1, matrix2):
 def culculate_size(n):
     i = 1
     pivot = n
-    while pivot % i == 0:
+    while pivot % 2 == 0 and pivot > MIN_SIZE:
         i *= 2
         pivot //= 2
+    if pivot <= MIN_SIZE:
+        return n
     while pivot > MIN_SIZE:
         i *= 2
-        pivot = (pivot + 1) / 2
+        pivot = (pivot + 1) // 2
     size = n + i - (n % i)
     return size
 

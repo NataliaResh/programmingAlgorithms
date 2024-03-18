@@ -11,6 +11,7 @@
 using namespace std;
 
 class BinomialHeap {
+  public:
   vector<BinomialHeap *> *heap_;
   BinomialHeap *up_ = NULL;
   int degree_ = 0;
@@ -18,8 +19,6 @@ class BinomialHeap {
   bool hightLevel_;
 
   static BinomialHeap *mergeTree(BinomialHeap *t1, BinomialHeap *t2) {
-    //cout << "mergetree\n";
-    cout.flush();
     assert(t1->degree_ == t2->degree_);
     if (t1->priority_ < t2->priority_) {
       t1->heap_->push_back(t2);
@@ -35,8 +34,6 @@ class BinomialHeap {
   }
 
   void merge(BinomialHeap *bh2) {
-    //cout << "merge\n";
-    cout.flush();
     if (!bh2) return;
     vector<BinomialHeap*> *ansHeap = new vector<BinomialHeap*>;
     BinomialHeap *carry = NULL;
@@ -65,7 +62,6 @@ class BinomialHeap {
         ansHeap->push_back(carry);
         carry = NULL;
       }
-      //cout << i << " " << j << "\n";
     }
     while (i < n) {
       if (carry && carry->degree_ == heap1->at(i)->degree_) {
@@ -90,12 +86,13 @@ class BinomialHeap {
         ansHeap->push_back(heap2->at(j++));
       }
     }
+    if (carry) {
+      ansHeap->push_back(carry);
+    }
     heap_ = ansHeap;
   }
 
   void shiftUp(BinomialHeap *bh) {
-    cout << "shift\n";
-    cout.flush();
     if (!bh->up_) return;
     if (bh->priority_ < bh->up_->priority_) {
       int pivot = bh->priority_;
@@ -105,12 +102,11 @@ class BinomialHeap {
     }
   }
 
-public:
+//public:
   
   BinomialHeap() : hightLevel_(true), heap_(new vector<BinomialHeap*>){}
 
   BinomialHeap(int priority, bool hightLevel) : hightLevel_(hightLevel), heap_(new vector<BinomialHeap*>) {
-    //cout << "constructor\n";
     if (hightLevel_) {
       BinomialHeap *pivot = new BinomialHeap(priority, false);
       heap_->push_back(pivot);
@@ -121,7 +117,7 @@ public:
 
   int peekMin() {
     if (!heap_->size()) {
-      cout << "Try exxtract min from empty heap!\n";
+      cout << "Try extract min from empty heap!\n";
       exit(1);
     }
     int ans = heap_->at(0)->priority_;
@@ -132,8 +128,6 @@ public:
   }
 
   void insert(int priority) {
-    //cout << "insert\n";
-    cout.flush();
     BinomialHeap *pivot = new BinomialHeap(priority, true);
     merge(pivot);
   }
@@ -145,7 +139,6 @@ public:
   }
 
   int extractMin() {
-    cout << "extract\n";
     if (!heap_->size()) {
       cout << "Try exxtract min from empty heap!\n";
       exit(1);
@@ -171,20 +164,19 @@ public:
 
 void test() {
   BinomialHeap *heap = new BinomialHeap();
-  for (int i = 1; i >= 0; i--) {
+  for (int i = 10; i >= 0; i--) {
     heap->insert(i);
   }
-  // for (int i = 15; i <= 20; i++) {
-  //   heap->insert(i);
-  // }
-  //assert(heap->peekMin() == 0);
-  for (int i = 0; i <= 1; i++) {
-    cout << heap->extractMin() << "\n";
-    //assert(heap->extractMin() == i);
+  for (int i = 15; i <= 20; i++) {
+    heap->insert(i);
   }
-  // for (int i = 15; i <= 20; i++) {
-  //   assert(heap->extractMin() == i);
-  // }
+  assert(heap->peekMin() == 0);
+    for (int i = 0; i <= 10; i++) {
+    assert(heap->extractMin() == i); 
+  }
+  for (int i = 15; i <= 20; i++) {
+    assert(heap->extractMin() == i);
+  }
 }
 
 int main() {

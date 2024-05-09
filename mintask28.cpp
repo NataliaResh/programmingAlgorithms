@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 
@@ -10,19 +11,21 @@ const size_t P = 1306717;
 class BloomFilter {
     int size_;
     vector<int> array_;
-    vector<int> hashes_;
+    vector<int> hashesA_;
+    vector<int> hashesB_;
+
     static const size_t sizeInt = sizeof(int) * 8;
 
     static string bin(int n) {
         string ans = "";
-        for (int i = sizeInt - 1; i >= 0; i--) {
+        for (int i = 0; i < sizeInt; i++) {
             ans += to_string((n >> i) & 1);
         }
         return ans;
     }
 
-    size_t hash(size_t x, size_t a) {
-        return ((a * x) % P) % size_;
+    size_t hash(size_t x, size_t a, size_t b) {
+        return ((a * x + b) % P) % size_;
     }
 
     void setBit(size_t i, size_t j) {
@@ -35,30 +38,37 @@ class BloomFilter {
 
 public:
     BloomFilter(size_t s, float prError) {
+        assert(prError > 0.0001f);
         if (prError == 0) throw;
-        size_t b = round(-log2(prError) / log(2.0f));
+        size_t b = ceil(-log2(prError) / log(2.0f));
         size_ = b * s;
-        size_t k = -round(log2(prError));
-        array_ = vector<int>(((size_ + sizeof(int) - 1) / sizeof(int) + 7) / 8, 0);
-        hashes_ = vector<int>(k);
+        size_t k = -floor(log2(prError));
+        array_ = vector<int>(((size_ + sizeof(int)) / sizeof(int) + 7) / 8, 0);
+        hashesA_ = vector<int>(k);
+        hashesB_ = vector<int>(k);
+
         for (size_t i = 0; i < k; i++) {
-            hashes_[i] = rand() % size_;
+            hashesA_[i] = rand() % size_;
+            hashesA_[i] = rand() % size_;
         }
         cout << "Size filter: " << size_ << "\nHash functions: " << k << "\n";
     }
 
 
     void insert(int ip) {
-        for (size_t i = 0; i < hashes_.size(); i++) {
-            size_t h = hash(ip, hashes_[i]);
+        for (size_t i = 0; i < hashesA_.size(); i++) {
+            size_t h = hash(ip, hashesA_[i], hashesB_[i]);
+            // cout << h << " " << h / sizeInt << " " << h % sizeInt << "\n";
             setBit(h / sizeInt, h % sizeInt);
         }
     }
 
     bool lookup(int ip) {
-        for (size_t i = 0; i < hashes_.size(); i++) {
-            size_t h = hash(ip, hashes_[i]);
+      // cout << "look\n";
+        for (size_t i = 0; i < hashesA_.size(); i++) {
+            size_t h = hash(ip, hashesA_[i], hashesB_[i]);
             if (!getBit(h / sizeInt, h % sizeInt))
+// cout << h << " " << h / sizeInt << " " << h % sizeInt << "\n";
                 return false;
         }
         return true;

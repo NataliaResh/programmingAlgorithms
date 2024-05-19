@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <cassert>
+#include <fstream>
 
 using namespace std;
 
@@ -25,9 +26,11 @@ bool isCycle(int node, vector<int> &visited, vector<int> &ans) {
   visited[node] = 1;
   bool cycle = false;
   for (auto newNode : graph[node]) {
-    if (visited[newNode] == 1) cycle = true;
-    if (visited[newNode] == 2) continue;
-     cycle = cycle || isCycle(newNode, visited, ans);
+    if (visited[newNode] == 1) {
+        cycle = true;
+    }
+    if (visited[newNode]) continue;
+     cycle = isCycle(newNode, visited, ans) || cycle;
     }
   ans.push_back(node);
   visited[node] = 2;
@@ -60,34 +63,38 @@ void saveFunc(int &c, string func) {
     }
 }
 
-void getGraphs(int n) {
+void getGraphs(int n, ifstream &cin) {
   int c = 0;
   for (size_t i = 0; i < n; i++) {
     string from;
     cin >> from;
+    cout << from << " ";
     from.pop_back();
     saveFunc(c, from);
     int nFrom = funcToInt[from];
     string func;
     cin >> func;
+    cout << func << " ";
     while (func.back() == ',') {
       func.pop_back();
       saveFunc(c, func);
       graph[nFrom].push_back(funcToInt[func]);
       reverseGraph[funcToInt[func]].push_back(nFrom);
       cin >> func;
+      cout << func << " ";
     }
+    cout << "\n";
     saveFunc(c, func);
     graph[nFrom].push_back(funcToInt[func]);
     reverseGraph[funcToInt[func]].push_back(nFrom);
   }
 }
 
-int main() {
+void solve(ifstream &cin) {
   int n;
   assert(n > 0);
   cin >> n;
-  getGraphs(n);
+  getGraphs(n, cin);
   auto ans = kosaraju();
   int maxIndex = -1;
   for (size_t i = 0; i < ans.size(); i++) {
@@ -100,7 +107,7 @@ int main() {
   }
   if (maxIndex == -1) {
     cout << "No recursion components\n";
-    return 0;
+    return;
   }
   cout << "Maximum recursion component: ";
   vector<int> &maxRC = ans[maxIndex].first;
@@ -108,5 +115,19 @@ int main() {
     cout << intToFunc[maxRC[i]] << ", ";
   }
   cout << intToFunc[maxRC[maxRC.size() - 1]] << "\n";
-  return 0;
+
+}
+int main() {
+  ifstream cin;
+  cin.open("tests.txt");
+  int m;
+  cin >> m;
+  for (int i = 0; i < m; i++) {
+    intToFunc = map<int, string>();
+    funcToInt = map<string, int>();
+    graph = map<int, vector<int>>();
+    reverseGraph = map<int, vector<int>>();
+    solve(cin);
+    cout << "\n";
+  }
 }

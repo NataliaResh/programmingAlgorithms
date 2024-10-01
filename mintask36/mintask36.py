@@ -14,10 +14,8 @@ class UnionFind:
         self.set_elements[index] = number
         if self.size == self.n:
             return
-        print(deadline, repr, index)
         self.union(repr, index)
         index = (self.n + index - 1) % self.n
-        print(index)
         while self.set_elements[index] != -1:
             new_index = self.left_children[self.find(index)]
             self.union(repr, index)
@@ -46,11 +44,8 @@ class UnionFind:
 def solution(data: str) -> list:
     data = data.split("\n")
     n = int(data[0])
-
     union_find = UnionFind(n)
-
     for i in range(1, n + 1):
         number, deadline, fine = map(int, data[i].split())
         union_find.append(number, deadline)
-        print(union_find.parents, union_find.left_children,  union_find.set_elements)
     return union_find.set_elements

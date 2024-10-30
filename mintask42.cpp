@@ -82,10 +82,8 @@ class ImplicitTreap {
             }
             t2 = t;
         } else {
-            if (t->right) {
                 splitBySize(t->right, k - size, t->right, t2);
                 t->update();
-            }
             t1 = t;
         }
     }
@@ -132,7 +130,7 @@ class ImplicitTreap {
     }
 
     ~ImplicitTreap() {
-        //destruct(root_);
+        destruct(root_);
     }
 };
 
@@ -142,15 +140,14 @@ void fullImplicitTreap(vector<int> array, ImplicitTreap& treap) {
     }
 }
 
-void test1() {
+
+void test(vector<int> array) {
     ImplicitTreap imt = ImplicitTreap();
-    int n = 7;
-    vector<int> array = {5, 24, 42, 13, 99, 2, 17};
+    int n = array.size();
     fullImplicitTreap(array, imt);
     vector<int> sums = vector<int>(n + 1, 0);
     for (int i = 1; i <= n; ++i) {
         sums[i] = sums[i - 1] + array[i - 1];
-        //assert(sums[i] == imt.sum(0, i));
     }
 
     for (int i = 0; i < n; ++i) {
@@ -159,9 +156,28 @@ void test1() {
         }
     }
 }
+
+void test2() {
+    ImplicitTreap imt = ImplicitTreap();
+    int n = 1;
+    vector<int> array = {5};
+    fullImplicitTreap(array, imt);
+    vector<int> sums = vector<int>(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        sums[i] = sums[i - 1] + array[i - 1];
+    }
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j <= n; ++j) {
+            assert(sums[j] - sums[i] == imt.sum(i, j));
+        }
+    }
+}
+
+
 int main() {
-    test1();
-    ImplicitTreap array = ImplicitTreap();
-    fullImplicitTreap({5, 24, 42, 13, 99, 2, 17}, array);
-    cout << array.sum(0, 6) << "\n";
+    test({5, 24, 42, 13, 99, 2, 17});
+    test({0});
+    test({});
+    cout << "All tests passed!\n";
 }

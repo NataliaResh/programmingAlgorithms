@@ -69,25 +69,17 @@ class ImplicitTreap {
             t1 = t2 = nullptr;
             return;
         }
-        if (k == 0) {
-            t1 = nullptr;
-            t2 = t;
-            return;
-        }
         int size = getSize(t->left) + 1;
         if (k < size) {
-            if (t->left) {
-                splitBySize(t->left, k, t1, t->left);
-                t->update();
-            }
+            splitBySize(t->left, k, t1, t->left);
+            t->update();
             t2 = t;
         } else {
-                splitBySize(t->right, k - size, t->right, t2);
-                t->update();
+            splitBySize(t->right, k - size, t->right, t2);
+            t->update();
             t1 = t;
         }
     }
-
 
     void destruct(Node *node) {
         if (!node) return;
@@ -112,6 +104,7 @@ class ImplicitTreap {
         Node *less, *equal, *greater;
         splitBySize(root_, position, less, greater);
         splitBySize(greater, position + count, equal, greater);
+        delete equal;
         root_ = merge(less, greater);
     }
 
